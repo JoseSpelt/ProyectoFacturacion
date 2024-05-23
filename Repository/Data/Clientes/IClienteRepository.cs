@@ -1,4 +1,5 @@
-﻿using System;
+﻿using examenOptativoP.Modelos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +12,8 @@ namespace Repository.Data.Clientes
        bool add(ClienteModel clienteModel);
        bool update(ClienteModel clienteModel);
        bool delete(int id);
-       bool get(int id);
-       IEnumerable<ClienteModel> GetAll();
+        ClienteModel get(int id);
+       IEnumerable<ClienteModel> listar();
 
     }
 }

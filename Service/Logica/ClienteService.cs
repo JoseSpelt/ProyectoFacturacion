@@ -1,17 +1,19 @@
-﻿using System;
+﻿using examenOptativoP.Modelos;
+using Repository.Data.Clientes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Repository.Data.Clientes
+namespace Service.Logica
 {
-    public class ClienteService: IClienteRepository
+    public class ClienteService
     {
         private ClienteRepository clienteRepository;
-        public ClienteService(string conexionString)
+        public ClienteService(string connectionString)
         {
-            clienteRepository = new ClienteRepository(conexionString);
+            clienteRepository = new ClienteRepository(connectionString);
         }
 
         public bool add(ClienteModel cliente)
@@ -19,9 +21,9 @@ namespace Repository.Data.Clientes
             return validarDatos(cliente) ? clienteRepository.add(cliente) : throw new Exception("Error en la validación de datos, corroborar");
         }
 
-        public IEnumerable<ClienteModel> GetAll()
+        public IEnumerable<ClienteModel> listar()
         {
-            return clienteRepository.GetAll();
+            return clienteRepository.listar();
         }
 
         public bool delete(int id)
@@ -39,19 +41,17 @@ namespace Repository.Data.Clientes
         {
             if (cliente == null)
                 return false;
-            if (string.IsNullOrEmpty(cliente.nom))
+            if (string.IsNullOrEmpty(cliente.nombre) || string.IsNullOrEmpty(cliente.apellido) || string.IsNullOrEmpty(cliente.documento))
                 return false;
-            if (string.IsNullOrEmpty(cliente.ape) && cliente.nom.Length < 2)
+            if (cliente.nombre.Length < 3 || cliente.apellido.Length < 3 || cliente.documento.Length < 3)
                 return false;
-            if (string.IsNullOrEmpty(cliente.docu))
+            if (cliente.celular.Length < 10)
                 return false;
-
             return true;
         }
-        public bool get(int id)
+        public ClienteModel get(int id)
         {
-            return true;
+            return clienteRepository.get(id);
         }
     }
 }
-
