@@ -19,5 +19,7 @@ namespace examenOptativoP.Modelos
         public float total_iva { get; set; }
         public string total_letras { get; set; }
         public string sucursal { get; set; }
+
+        public List<DetalleFacturaModel> detalleFactura { get; set; }
     }
 }
