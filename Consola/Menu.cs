@@ -15,9 +15,11 @@ public class Program
         FacturaService facturaService = new FacturaService(connectionString);
         SucursalService sucursalService = new SucursalService(connectionString);
         ProductoService productoService = new ProductoService(connectionString);
+        PedidoCompraService pedidoCompraService = new PedidoCompraService(connectionString);
+        ProveedorService proveedorService = new ProveedorService(connectionString);
         Console.WriteLine("<-------------------MENU PRINCIPAL---------------------------->");
         Console.WriteLine("<-----------SELECCIONE UNA DE LAS OPCIONES-------------------->");
-        Console.WriteLine("(1) CLIENTE \n(2) FACTURA \n(3) SUCURSAL \n(4) PRODUCTO");
+        Console.WriteLine("(1) CLIENTE \n(2) FACTURA \n(3) SUCURSAL \n(4) PRODUCTO \n(5) PEDIDOS \n(6) PROVEEDOR");
         string opcionMenu = Console.ReadLine();
         if (opcionMenu == "1")
         {
@@ -389,5 +391,202 @@ public class Program
                     break;
             }
         }
+        else if (opcionMenu == "5")
+        {
+            Console.WriteLine("---Selecciona una opción de Pedidos ---  \n1 -> Insertar Pedido \n2 -> Listar Pedidos \n3 -> Modificar un Pedido por ID \n4 -> Eliminar un Pedido por ID \n5 -> Buscar un Pedido por ID ");
+            string opcion = Console.ReadLine();
+            int opcionSelect = int.Parse(opcion);
+
+            switch (opcionSelect)
+            {
+                case 1:
+                    var nuevoPedidoCompra = new PedidoCompraModel
+                    {
+                        id_proveedor = 1,
+                        id_sucursal = 3,
+                        fechaHora = new DateTime(2024, 05, 21),
+                        detallePedido = new List<DetallePedidoCompra>
+                {
+                    new DetallePedidoCompra { id_producto = 1, cantidadProducto = 2, subtotal = 200000 },
+                    new DetallePedidoCompra { id_producto = 2, cantidadProducto = 3, subtotal = 300000 }
+                }
+                    };
+                    nuevoPedidoCompra.total = nuevoPedidoCompra.detallePedido.Sum(detalle => detalle.subtotal);
+                    pedidoCompraService.add(nuevoPedidoCompra);
+                    break;
+                case 2:
+                    pedidoCompraService.listar().ToList().ForEach(pedidoCompra =>
+                    {
+                        Console.WriteLine(
+                            $"ID Pedido: {pedidoCompra.id}\n" +
+                            $"ID Proveedor: {pedidoCompra.id_proveedor}\n" +
+                            $"ID Sucursal: {pedidoCompra.id_sucursal}\n" +
+                            $"Fecha: {pedidoCompra.fechaHora}\n" +
+                            $"Total: {pedidoCompra.total}\n");
+
+                        if (pedidoCompra.detallePedido != null && pedidoCompra.detallePedido.Any())
+                        {
+                            Console.WriteLine("Detalles del Pedido:");
+                            foreach (var detalle in pedidoCompra.detallePedido)
+                            {
+                                Console.WriteLine(
+                                    $"  ID Producto: {detalle.id_producto}\n" +
+                                    $"  Cantidad: {detalle.cantidadProducto}\n" +
+                                    $"  Subtotal: {detalle.subtotal}\n");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("No hay detalles del pedido.");
+                        }
+                    });
+                    break;
+                case 3:
+                    var pedidoCompraActualizado = new PedidoCompraModel
+                    {
+                        id = 5,
+                        id_proveedor = 3,
+                        id_sucursal = 3,
+                        fechaHora = new DateTime(2024, 05, 22),
+                        detallePedido = new List<DetallePedidoCompra>
+                {
+                    new DetallePedidoCompra { id = 1, id_producto = 1, cantidadProducto = 2, subtotal = 300000 },
+                    new DetallePedidoCompra { id = 2, id_producto = 2, cantidadProducto = 4, subtotal = 400000 }
+                }
+                    };
+                    pedidoCompraActualizado.total = pedidoCompraActualizado.detallePedido.Sum(detalle => detalle.subtotal);
+                    pedidoCompraService.update(pedidoCompraActualizado);
+                    break;
+                case 4:
+                    Console.WriteLine("Ingrese el ID del pedido que quiere eliminar:");
+                    string input = Console.ReadLine();
+                    int idSelect = int.Parse(input);
+                    pedidoCompraService.delete(idSelect);
+                    break;
+                case 5:
+                    Console.WriteLine("Ingrese el ID del pedido que quiere buscar:");
+                    string buscar = Console.ReadLine();
+                    int idbuscar = int.Parse(buscar);
+                    PedidoCompraModel pedidoCompra = pedidoCompraService.get(idbuscar);
+                    if (pedidoCompra != null)
+                    {
+                        Console.WriteLine(
+                            $"ID Pedido: {pedidoCompra.id} \n" +
+                            $"ID Proveedor: {pedidoCompra.id_proveedor} \n" +
+                            $"ID Sucursal: {pedidoCompra.id_sucursal} \n" +
+                            $"Fecha: {pedidoCompra.fechaHora} \n" +
+                            $"Total: {pedidoCompra.total} \n");
+
+                        if (pedidoCompra.detallePedido != null && pedidoCompra.detallePedido.Any())
+                        {
+                            Console.WriteLine("Detalles del Pedido:");
+                            foreach (var detalle in pedidoCompra.detallePedido)
+                            {
+                                Console.WriteLine(
+                                    $"ID Producto: {detalle.id_producto} \n" +
+                                    $"Cantidad Producto: {detalle.cantidadProducto} \n" +
+                                    $"Subtotal: {detalle.subtotal} \n");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("No hay detalles del pedido.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Pedido no encontrado.");
+                    }
+                    break;
+                default:
+                    Console.WriteLine("Esa opción no es válida");
+                    break;
+            }
+        }
+
+        else if (opcionMenu == "6")
+        {
+            Console.WriteLine("---Selecciona una opción de Proveedor---  \n1 -> Insertar Proveedor \n2 -> Listar Proveedores \n3 -> Modificar un Proveedor por ID \n4 -> Eliminar un Proveedor por ID \n5 -> Buscar un Proveedor por ID ");
+            string opcion = Console.ReadLine();
+            int opcionSelect = int.Parse(opcion);
+
+            switch (opcionSelect)
+            {
+                case 1:
+                    var nuevoProveedor = new ProveedorModel
+                    {
+                        razonSocial = "Proveedor Ejemplo",
+                        tipoDocumento = "RUC",
+                        numeroDocumento = "8000898-9",
+                        direccion = "Av. Principal 123",
+                        mail = "proveedor@ejemplo.com",
+                        celular = "0981234567",
+                        estado = "Activo"
+                    };
+                    proveedorService.add(nuevoProveedor);
+                    break;
+                case 2:
+                    proveedorService.listar().ToList().ForEach(proveedor =>
+                    {
+                        Console.WriteLine(
+                            $"ID Proveedor: {proveedor.id}\n" +
+                            $"Razón Social: {proveedor.razonSocial}\n" +
+                            $"Tipo Documento: {proveedor.tipoDocumento}\n" +
+                            $"Número Documento: {proveedor.numeroDocumento}\n" +
+                            $"Dirección: {proveedor.direccion}\n" +
+                            $"Mail: {proveedor.mail}\n" +
+                            $"Celular: {proveedor.celular}\n" +
+                            $"Estado: {proveedor.estado}\n");
+                    });
+                    break;
+                case 3:
+                    var proveedorActualizado = new ProveedorModel
+                    {
+                        id = 5,
+                        razonSocial = "Proveedor Actualizado",
+                        tipoDocumento = "RUC",
+                        numeroDocumento = "0987654321",
+                        direccion = "Av. Secundaria 456",
+                        mail = "proveedor@actualizado.com",
+                        celular = "0987654321",
+                        estado = "Activo"
+                    };
+                    proveedorService.update(proveedorActualizado);
+                    break;
+                case 4:
+                    Console.WriteLine("Ingrese el ID del proveedor que quiere eliminar:");
+                    string input = Console.ReadLine();
+                    int idSelect = int.Parse(input);
+                    proveedorService.delete(idSelect);
+                    break;
+                case 5:
+                    Console.WriteLine("Ingrese el ID del proveedor que quiere buscar:");
+                    string buscar = Console.ReadLine();
+                    int idbuscar = int.Parse(buscar);
+                    ProveedorModel proveedor = proveedorService.get(idbuscar);
+                    if (proveedor != null)
+                    {
+                        Console.WriteLine(
+                            $"ID Proveedor: {proveedor.id}\n" +
+                            $"Razón Social: {proveedor.razonSocial}\n" +
+                            $"Tipo Documento: {proveedor.tipoDocumento}\n" +
+                            $"Número Documento: {proveedor.numeroDocumento}\n" +
+                            $"Dirección: {proveedor.direccion}\n" +
+                            $"Mail: {proveedor.mail}\n" +
+                            $"Celular: {proveedor.celular}\n" +
+                            $"Estado: {proveedor.estado}\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Proveedor no encontrado.");
+                    }
+                    break;
+                default:
+                    Console.WriteLine("Esa opción no es válida");
+                    break;
+            }
+        }
+
+
     }
 }
